@@ -82,32 +82,46 @@ Section \ref{sec:method:phase_estimation}. We then present a method that uses th
 \subsection{Instantaneous phase estimation of each frame}
 \label{sec:method:phase_estimation}
 %
+%
+\begin{IonFigT}
+\centering
+%
+\includegraphics[width=4.75in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/simMat.png}
+\ionbox{4.75in}\\
+\includegraphics[width=4.75in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/season_trend_decomposition.png}
+\ionbox{4.75in}\\
+\includegraphics[width=4.75in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/periodogram.png}
+\ionbox{4.75in}\\
+\includegraphics[width=4.75in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instantaneous_phase.png}
+\ionbox{4.75in}\\
+%
+\caption{Illustration of the proposed phase estimation method}
+\label{fig:phase_estimation}
+\end{IonFigT}
+%
 While there have been numerous efforts for the estimation of instantaneous intra-period phase\cite{Lu2013} in periodic univariate time series data (wherein a single-variable is measured at each time point), we are not aware of any methods that tackle this problem in a multivariate setting which is the case with periodic image sequences wherein several thousands of variables (intensities of pixels) could be measured at each time point. Our strategy was to find a way to simplify this seemingly complex multi-variate problem by transforming it into a univariate one and take advantage of existing methods to solve the problem at hand. To accomplish this, we compute the similarity/affinity between all pairs of frames in the given periodic image sequence containing $n$ images to create a matrix $A \in R^{n \times n}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ frames of the given sequence. In principle, any of the similarity metrics used in image registration algorithms can be chosen to quantify the similarity between a given pair of frames. Here in, we use normalization correlation also known as the pearson correlation coefficient. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series that measures the similarity of the corresponding frame in the image sequence with all other frames. Additionally, for a periodic image sequence, we can expect them to be periodic provided that the corresponding frame is not significantly corrupted by distortions such as noise and changes in global illumination over time among others. To mitigate the potential problem of global illumintation changes over time, we detrend and extract the seasonal part of the time series corresponding to each row of $A$ by dividing it with the trend signal estimated using a locally-weighted regression algorithm called loess\cite{Cleveland1990}. Let $A_s$ be the matrix whose rows contain the seasonal part obtained by detrending the corresponding row in $A$. Next, we minimize the risk from noise, by finding the row $u(t)$ of $A_s$ whose power spectrum or periodogram has minimum entropy. In our experiments, the time series $u(t)$ was nearly sinusoidal in morphology with most of its energy in its power spectrum concentrated within a very narrow-band with the same periodicity characteristics as the image sequence it was derived from. Based on this observation, we decided to use its Hilbert transform \cite{Lu2013} to estimate the instantaneous intra-period phase  of each frame. Specifically, we compute the instantaneous phase $\phi(t) \in \left [  -\pi, \pi\right )$ of the time series $u(t)$ as follows:
 \begin{equation}
 \phi(t) = arctan \left( \frac{H_u(t)}{u(t)}\right)
 \end{equation} 
 where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantaneous phase $\phi(t)$ to the range $\left [  0, 1\right )$ which can then be used to obtain the intra-period phase of each frame.
-%
-\begin{IonFigT}
-\centering
-%
-\includegraphics[width=1.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/simMat.png}
-\includegraphics[width=1.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/simMat_Trend.png}
-\includegraphics[width=1.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/simMat_Seasonal.png}
-\ionbox{1.5in}\ionbox{1.5in}\ionbox{1.5in}\\
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/season_trend_decomposition.png}
-\ionbox{4.5in}
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instantaneous_phase.png}
-\ionbox{4.5in}
-%
-\caption{Illustration of the proposed phase estimation method}
-\label{fig:phase_estimation}
-\end{IonFigT}
+
 %\vspace{-0.5cm}
 \subsection{Gating of respiratory frames}
 \label{sec:method:gating}
 %
 
+%
+\begin{IonFigT}
+\centering
+%
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/respiratory_phase_gating.png}
+\ionbox{5.0in}\\
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/robust_lowess_gating.png}
+\ionbox{5.0in}\\
+%
+\caption{Illustration of our method for gating respiratory frames}
+\label{fig:respiratory_gating}
+\end{IonFigT}
 %
 %\vspace{-0.5cm}
 \subsection{Reconstruction of one-period video at high temporal resolution}
@@ -118,7 +132,17 @@ where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantane
 \section{Results}
 \label{sec:results}
 %
-
+%
+\begin{IonFigT}
+\centering
+%
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
+\ionbox{5.0in}\\
+%
+\caption{Visualization of video frames are ordered by estimated cardiac phase}
+\label{fig:phase_ordering}
+\end{IonFigT}
+%
 %
 %\vspace{-0.5cm}
 \section{Discussion and future work}
