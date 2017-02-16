@@ -61,27 +61,25 @@ Point-of-care low-cost hand-held ultrasound devices are emerging as an increasin
 \section{Method}
 \label{sec:method}
 %
-In this section, we present the theory underlying the proposed methods for instantaneous phase estimation, gating and temporal super-resolution of cardiac ultrasound videos. Specifically, we begin by describing our method for the estimation of instantaneous cardiac and respiratory phases in 
-Section \ref{sec:method:phase_estimation}. We then present a method that uses these phase estimates to robustly gate video frames predominantly influenced by respiratory motion in Section \ref{sec:method:gating}. Finally, in Section \ref{sec:method:super_resolution}, we present a kernel regression method that uses the phase-tagged image sequence to reconstruct a single-period video at higher-temporal resolution. 
+In this section, we present the theory underlying the proposed methods for instantaneous phase estimation, gating and temporal super-resolution of cardiac ultrasound videos. Specifically, we begin by describing our method for the estimation of instantaneous cardiac and respiratory phases in Section \ref{sec:method:phase_estimation}. We then present a robust method that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion in Section \ref{sec:method:gating}. Finally, in Section \ref{sec:method:super_resolution}, we present a kernel regression method that uses the phase-tagged image sequence to reconstruct a single-period video at higher-temporal resolution. 
 %
 %
 \begin{IonFigT}
 \centering
 %
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/ecg_instaphase_overlay.png}\\
-\ionbox{4.5in}\\
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/qrs_peak_to_peak.png}
-\ionbox{4.5in}\\
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instaphase_valley_to_valley.png}
-\ionbox{4.5in}\\
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/ecg_instaphase_overlay.png}\\
+\ionbox{5.0in}\\
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/qrs_peak_to_peak.png}
+\ionbox{5.0in}\\
+\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instaphase_valley_to_valley.png}
+\ionbox{5.0in}\\
 %
 \caption{Illustration of correspondence between ECG and the instantaneous cardiac phase estimated using the proposed method: (a) ECG signal (blue) and the cardiac phase estimated using our method using only image data. Also shown are the peaks of the QRS complex (pink circle) and the minima of the estimated cardiac phase (black circle) that correspond to the QRS peaks, (b) Five video frames evenly spaced in time between the first and second QRS peaks of the ECG signal constituting one cardiac cycle, and (c) Five video frames evenly spaced in time between first and second minima of the estimated cardiac phase constituting one cardiac cycle.}
 \label{fig:instaphase_vs_ecg}
 \end{IonFigT}
 %\vspace{-0.5cm}
-\subsection{Instantaneous phase estimation of each frame}
+\subsection{Estimation of instantaneous cardiac and respiratory phases}
 \label{sec:method:phase_estimation}
-%
 %
 \begin{IonFigT}
 \centering
@@ -95,21 +93,23 @@ Section \ref{sec:method:phase_estimation}. We then present a method that uses th
 \includegraphics[width=4.75in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instantaneous_phase.png}
 \ionbox{4.75in}\\
 %
-\caption{Illustration of the proposed phase estimation method}
+\caption{Illustration of the proposed phase estimation method: (a-left) Inter-frame similarity matrix, (a-mid) Trend component corresponding to the respiratory motion, (a-right) Seasonal component corresponding to the beating heart motion, (b) Similarity profile with minimum spectral entropy along with the associated trend/respiration and seasonal/heart-beat components, (c) Periodogram of the heart-beat and respiration components, and (d) Instantaneous phase of heart-beat and respiration components.}
 \label{fig:phase_estimation}
 \end{IonFigT}
 %
-While there have been numerous efforts for the estimation of instantaneous intra-period phase\cite{Lu2013} in periodic univariate time series data (wherein a single-variable is measured at each time point), we are not aware of any methods that tackle this problem in a multivariate setting which is the case with periodic image sequences wherein several thousands of variables (intensities of pixels) could be measured at each time point. Our strategy was to find a way to simplify this seemingly complex multi-variate problem by transforming it into a univariate one and take advantage of existing methods to solve the problem at hand. To accomplish this, we compute the similarity/affinity between all pairs of frames in the given periodic image sequence containing $n$ images to create a matrix $A \in R^{n \times n}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ frames of the given sequence. In principle, any of the similarity metrics used in image registration algorithms can be chosen to quantify the similarity between a given pair of frames. Here in, we use normalization correlation also known as the pearson correlation coefficient. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series that measures the similarity of the corresponding frame in the image sequence with all other frames. Additionally, for a periodic image sequence, we can expect them to be periodic provided that the corresponding frame is not significantly corrupted by distortions such as noise and changes in global illumination over time among others. To mitigate the potential problem of global illumintation changes over time, we detrend and extract the seasonal part of the time series corresponding to each row of $A$ by dividing it with the trend signal estimated using a locally-weighted regression algorithm called loess\cite{Cleveland1990}. Let $A_s$ be the matrix whose rows contain the seasonal part obtained by detrending the corresponding row in $A$. Next, we minimize the risk from noise, by finding the row $u(t)$ of $A_s$ whose power spectrum or periodogram has minimum entropy. In our experiments, the time series $u(t)$ was nearly sinusoidal in morphology with most of its energy in its power spectrum concentrated within a very narrow-band with the same periodicity characteristics as the image sequence it was derived from. Based on this observation, we decided to use its Hilbert transform \cite{Lu2013} to estimate the instantaneous intra-period phase  of each frame. Specifically, we compute the instantaneous phase $\phi(t) \in \left [  -\pi, \pi\right )$ of the time series $u(t)$ as follows:
+While there have been numerous efforts for the estimation of instantaneous phase and/or frequency in periodic univariate time series data (wherein a single-variable is measured at each time point)\cite{Boashash1992,Lu2013,Luo2003}, we are not aware of any methods that tackle this problem in a multivariate setting which is the case with cardiac ultrasound videos wherein several thousands of variables (intensities of pixels) could be measured at each time point. Our strategy was to find a way to simplify this seemingly complex multi-variate problem by transforming it into a univariate one and take advantage of existing univariate methods to solve the problem at hand. To accomplish this, we compute the similarity/affinity between all pairs of frames in the given periodic image sequence containing $n$ images to create a matrix $A \in R^{n \times n}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ frames of the given sequence. Here in, we use normalization correlation also known as the Pearson correlation coefficient to quantify inter-frame similarity but, in principle, any of the similarity metrics used in image registration algorithms \cite{Goshtasby2012} can potentially be chosen. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series that measures the similarity of the corresponding frame in the image sequence with all other frames. Additionally, for a periodic image sequence, we can expect them to be periodic provided that the corresponding frame is not significantly corrupted by distortions such as noise and changes in global illumination over time among others. 
+
+To mitigate the potential problem of global illumintation changes over time, we detrend and extract the seasonal part of the time series corresponding to each row of $A$ by dividing it with the trend signal estimated using a locally-weighted regression algorithm called loess\cite{Cleveland1990}. Let $A_s$ be the matrix whose rows contain the seasonal part obtained by detrending the corresponding row in $A$. Next, we minimize the risk from noise, by finding the row $u(t)$ of $A_s$ whose power spectrum or periodogram has minimum entropy. In our experiments, the time series $u(t)$ was nearly sinusoidal in morphology with most of its energy in its power spectrum concentrated within a very narrow-band with the same periodicity characteristics as the image sequence it was derived from. Based on this observation, we decided to use its Hilbert transform \cite{Lu2013} to estimate the instantaneous intra-period phase  of each frame. Specifically, we compute the instantaneous phase $\phi(t) \in \left [  -\pi, \pi\right )$ of the time series $u(t)$ as follows:
 \begin{equation}
 \phi(t) = arctan \left( \frac{H_u(t)}{u(t)}\right)
 \end{equation} 
 where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantaneous phase $\phi(t)$ to the range $\left [  0, 1\right )$ which can then be used to obtain the intra-period phase of each frame.
 
 %\vspace{-0.5cm}
-\subsection{Gating of respiratory frames}
+\subsection{Gating out respiratory frames}
 \label{sec:method:gating}
 %
-
+Once the instantaneous cardiac and respiratory phases of each frame has been estimated, it can be used to facilitate the extraction of quantitative measurements from a desired part/point of the periodic cycle, a process commonly referred to as gating. In this section, we present a robust method that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion.
 %
 \begin{IonFigT}
 \centering
@@ -119,7 +119,7 @@ where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantane
 \includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/robust_lowess_gating.png}
 \ionbox{5.0in}\\
 %
-\caption{Illustration of our method for gating respiratory frames}
+\caption{Illustration of our method for gating out respiratory frames: (a) (b)}
 \label{fig:respiratory_gating}
 \end{IonFigT}
 %
@@ -127,7 +127,13 @@ where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantane
 \subsection{Reconstruction of one-period video at high temporal resolution}
 \label{sec:method:super_resolution}
 %
-
+Once the instantaneous cardiac phase of each frame has been estimated, it can be used to enable spatio-temporal super-resolution by considering the set of images within each period of a periodic image sequence as distinct observations of the same data. In this section, we present a method that uses a phase-tagged periodic image sequence to reconstruct a single-period video at a higher temporal resolution. 
+	
+Given a de-noised periodic sequence $\{L_1, ..., L_n\}$ of $n$ images (with $m$ pixels each) along with their estimated intra-period phases $\{\phi_1, ..., \phi_n\}$, we first use Nadarya-Watson kernel regression\cite{Bishop2006} to construct a phase-parameterized image manifold in the form of a function $M(\phi): [0, 1) \to R^m $ that maps any intra-period phase $\phi$ to an image as follows:
+\begin{equation}
+M(\phi) = \frac{\sum_{i = 1}^{n} K(\phi, \phi_i) L_i}{\sum_{i = 1}^{n} K(\phi, \phi_i)} 
+\end{equation}
+where in we define the kernel $K$ using a gausssian with standard-deviation $\sigma$ equal to a multiple of the average distance between consecutive phases after sorting them. Note that, we account for the periodic nature of the intra-period phase whenever we measure distance between two phase values. A single-period video can now be reconstructed by sampling the manifold $M(\phi)$ at any desired resolution from the range $[0, 1)$ of intra-period phase. Note that the aformentioned process will facilitate temporal super-resolution only if the set of images observed in each distinct period of the given image sequence differ in intra-period phase by some non-zero amount less than its temporal sampling interval. Also, the amount of temporal super-resolution possible will depend both on the number of periods observed and the maximum amount by which one can expect the images to be perturbed in phase across observations. 
 %\vspace{-0.5cm}
 \section{Results}
 \label{sec:results}
@@ -139,7 +145,7 @@ where $H_u(t)$ is the Hilbert transform of $u(t)$. Lastly, we map the instantane
 \includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
 \ionbox{5.0in}\\
 %
-\caption{Visualization of video frames are ordered by estimated cardiac phase}
+\caption{Visualization of m-mode frames ordered by estimated cardiac phase}
 \label{fig:phase_ordering}
 \end{IonFigT}
 %
