@@ -132,6 +132,16 @@ Once the cardiac and respiratory phases of each frame has been estimated, it can
 	
 	In the second step, we learn a robust mapping $L(\phi) : \left [  0, 1\right ) \to R$ from cardiac phase to the residual/heart-beat component of the frame similarity signal by fitting a robust non-parametric regression model called Locally weighted regression (LOWESS) to the dataset $\left \{ \left(\hat{\phi}_{heart}(t), \hat{r}_{heart}(t) \right) \mid t \notin F_{cutoff}  \right \}$ containing the pair of the cardiac phase $\hat{\phi}_{heart}(t)$ and residual/heart-beat $\hat{r}_{heart}(t)$ signal values of all frames that do not belong to the set of frames $F_{cutoff}$ discarded in the first step above. Next, we compute a robust estimate of the standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit based on the median absolute value of the difference between the LOWESS fit $L( \hat{\phi}_{heart}(t) )$ and residual/heart-beat signal $\hat{r}_{heart}(t)$ for all frames. Lastly, we gate out all frames $F_{resp} = \left \{ t \; \big\lvert \; \lvert L( \hat{\phi}_{heart}(t) ) - \hat{r}_{heart}(t)  \rvert   > k \times \hat{\sigma}_{L}  \right \}$ for which the absolute  difference between the LOWESS fit and heart-beat signal value is greater than $k = 0.2$ times the standard deviation $\hat{\sigma}_{L}$.	
 %
+\begin{IonFigT}
+\centering
+%
+\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
+\ionbox{1.0in}\ionbox{1.0in}\ionbox{1.0in}\ionbox{1.0in}\\
+%
+\caption{Visualization of m-mode frames ordered by estimated cardiac phase}
+\label{fig:phase_ordering}
+\end{IonFigT}
+%
 %\vspace{-0.5cm}
 \subsection{Model to generate images by cardiac phase for super-resolution}
 \label{sec:method:super_resolution}
@@ -149,27 +159,32 @@ where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ 
 \section{Results}
 \label{sec:results}
 %
+We use cardiac ultrasound videos and associated ECG recordings of 6 mice to validate the proposed methods. The ultrasound videos were acquired using the VisualSonics Vevo 2100 scanner at 233 frames per second. Furthermore, each video consisted of approximately 300 frames, 11 cardiac cycles, and 2 respiratory cycles.
+
+	We validate our cardiac phase estimation method by comparing its phase estimates with the ECG signal. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a head-to-head comparison between the ECG signal and the instantaneous cardiac phase obtained using the method described in Section~\ref{sec:method:phase_estimation} for one of the 6 videos. 
+	
+%
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-VID & $R^2$ & Mean $\pm$ Std & Median $\pm$ IQR \\ \hline
-1 & 0.9995 & 1.55 $\pm$ 0.89 & 1.00 $\pm$ 1.00 \\ \hline
-2 & 0.9995 & 1.36 $\pm$ 1.15 & 1.00 $\pm$ 2.00 \\ \hline
-3 & 0.9996 & 1.45 $\pm$ 0.89 & 2.00 $\pm$ 1.00 \\ \hline
-4 & 0.9998 & 0.73 $\pm$ 0.62 & 1.00 $\pm$ 1.00 \\ \hline
-5 & 0.9990 & 2.09 $\pm$ 1.78 & 1.00 $\pm$ 2.00 \\ \hline
-6 & 0.9992 & 1.40 $\pm$ 1.74 & 1.00 $\pm$ 0.75 \\ \hline
+\begin{tabular}[c]{@{}c@{}}VID\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}$R^2$\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Prediction Error\\ Mean $\pm$ Std\end{tabular} \\ \hline
+1 & 0.9995 & 1.55 $\pm$ 0.89 \\ \hline
+2 & 0.9995 & 1.36 $\pm$ 1.15 \\ \hline
+3 & 0.9996 & 1.45 $\pm$ 0.89 \\ \hline
+4 & 0.9998 & 0.73 $\pm$ 0.62 \\ \hline
+5 & 0.9990 & 2.09 $\pm$ 1.78 \\ \hline
+6 & 0.9992 & 1.40 $\pm$ 1.74 \\ \hline
 \end{tabular}
-\caption{My caption}
-\label{my-label}
+\caption{Comparision between frame positions of QRS peaks in the ECG signal and the corresponding minima of the cardiac phase estimated using our method for 6 videos}
+\label{table:phase_estimation}
 \end{table}
 %
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-\begin{tabular}[c]{@{}c@{}}\\ VID \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50) NCORR\\ Mean $\pm$ Std\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frame NCORR\\ Mean $\pm$ Std\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50) NCORR\\ Mean $\pm$ Std\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frame NCORR\\ Mean $\pm$ Std\end{tabular} \\ \hline
 1 & 0.8562 $\pm$ 0.0366 & 0.7981 $\pm$ 0.0532 \\ \hline
 2 & 0.8558 $\pm$ 0.0525 & 0.7877 $\pm$ 0.0503 \\ \hline
 3 & 0.8592 $\pm$ 0.0348 & 0.7849 $\pm$ 0.0457 \\ \hline
@@ -178,19 +193,10 @@ VID & $R^2$ & Mean $\pm$ Std & Median $\pm$ IQR \\ \hline
 6 & 0.8736 $\pm$ 0.0278 & 0.8270 $\pm$ 0.0778 \\ \hline
 \end{tabular}
 \caption{My caption}
-\label{my-label}
+\label{table:image_reconstruction}
 \end{table}
 %
-\begin{IonFigT}
-\centering
-%
-\includegraphics[width=5.0in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
-\ionbox{5.0in}\\
-%
-\caption{Visualization of m-mode frames ordered by estimated cardiac phase}
-\label{fig:phase_ordering}
-\end{IonFigT}
-%
+
 %
 %\vspace{-0.5cm}
 \section{Discussion and future work}
