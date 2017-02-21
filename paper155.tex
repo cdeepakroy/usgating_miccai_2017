@@ -6,6 +6,7 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{multirow}
+\usepackage{wrapfig}
 %
 \newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg}\operatorname{min}}\;}
 %
@@ -55,10 +56,10 @@ In this paper, we present a novel purely image-based method for the estimation o
 \section{Introduction}
 \label{sec:intro}
 %
-Ultrasound is emerging as an increasingly effective tool for rapid non-invasive visual assessment of cardiac structure and function. 
+Cardiovascular disease is the leading cause of death worldwide and ultrasound is emerging as an increasingly effective tool for rapid non-invasive visual assessment of cardiac structure and function. 
 %
 
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \section{Method}
 \label{sec:method}
 %
@@ -74,10 +75,10 @@ In this section, we present the theory underlying the proposed methods for insta
 \includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/instaphase_valley_to_valley.png}
 \ionbox{4.5in}\\
 %
-\caption{Illustration of correspondence between ECG and the instantaneous cardiac phase estimated using the proposed method: (a) ECG signal (blue) and the cardiac phase estimated using our method overlaid with peaks of the QRS complex (red circle) and the corresponding cardiac phase minima (black circle), (b) Five video frames evenly spaced in time between the first and second QRS peaks of the ECG signal (top-row) and the corresponding cardiac phase minima (bottom-row) constituting one cardiac cycle.}
+\caption{Illustration of correspondence between ECG and the instantaneous cardiac phase estimated using our method: (a) ECG signal (blue) and the cardiac phase estimated using our method overlaid with peaks of the QRS complex (red circle) and the corresponding cardiac phase minima (black circle), (b) Five video frames evenly spaced in time between the first and second QRS peaks of the ECG signal (top-row) and the corresponding cardiac phase minima (bottom-row) constituting one cardiac cycle.}
 \label{fig:instaphase_vs_ecg}
 \end{IonFigT}
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \subsection{Estimation of instantaneous cardiac and respiratory phases}
 \label{sec:method:phase_estimation}
 %
@@ -109,7 +110,7 @@ where $\nabla^2\tau_{resp}(t) = \tau_{resp}(t+1) - 2 \tau_{resp}(t) + \tau_{resp
 		
 	Next, considering the narrow-band nature (see  Figure~\ref{fig:phase_estimation}) of the derived trend/respiratory and residual/heart-beat signals, we use the Hilbert transform~\cite{Lu2013} to estimate the instantaneous phase of each frame. Specifically, we compute the instantaneous intra-period phase $\phi(t) \in \left [  -\pi, \pi\right )$ of the periodic time series $x(t)$ using its Hilbert transform $H_x(t)$ as follows: $\phi(t) = arctan \left( \frac{H_x(t)}{x(t)}\right)$ and map $\phi(t)$ from the range $\left [  -\pi, \pi\right )$ to $\left [  0, 1\right )$. Let $\hat{\phi}_{heart}(t)$ and $\hat{\phi}_{resp}(t)$ denote the instantaneous cardiac and respiratory phases computed from the trend/respiration $\hat{\tau}_{resp}(t)$ and residual/heart-beat $\hat{r}_{heart}(t)$ signals, respectively. Figure~\ref{fig:phase_estimation}(f) shows the instantaneous cardiac and respiratory phases computed from the heart-beat and respiration signals in Figure~\ref{fig:phase_estimation}(d). 
 %
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \subsection{Gating out respiratory frames}
 \label{sec:method:gating}
 %
@@ -136,13 +137,13 @@ Once the cardiac and respiratory phases of each frame has been estimated, it can
 \centering
 %
 \includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
-\ionbox{1.0in}\ionbox{1.0in}\ionbox{1.0in}\ionbox{1.0in}\\
+\ionbox{1.2in}\ionbox{1.1in}\ionbox{1.1in}\ionbox{1.1in}\\
 %
-\caption{Visualization of m-mode frames ordered by estimated cardiac phase}
+\caption{Visualization of m-mode frames ordered by estimated cardiac phase: (a) One of the frames in the video overlaid with the M-mode line shown in the next three images, (b) M-mode frames in the order they appear in the input video, (c) M-mode frames ordered by estimated cardiac phase, and (d) Non-respiratory m-mode frames ordered by estimated cardiac phase.}
 \label{fig:phase_ordering}
 \end{IonFigT}
 %
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \subsection{Model to generate images by cardiac phase for super-resolution}
 \label{sec:method:super_resolution}
 %
@@ -155,20 +156,17 @@ M(\phi) = \frac{\sum_{t = 1}^{N} K \left( \phi, \hat{\phi}_{heart}(t) \right) I(
 where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ \mid \phi - \hat{\phi}_{heart}(t) \mid^2}{2  \sigma^2_\phi} \right \} \times exp\left \{ -\frac{ \mid L(\phi) - \hat{r}_{heart}(t) \mid^2}{2  \sigma^2_{L}} \right \}$ is defined as the product of two radial-basis function (RBF) kernels. The first RBF kernel  weighs images inversely proportional to their distance (accounting for periodicity) in the cardiac phase space. Its bandwidth $\sigma_\phi$ is set equal to a constant $k_\phi = 0.4$ times the median difference in cardiac phase between consecutive frames of the given image sequence. The second RBF kernel weighs images inversely proportional to their deviation from the LOWESS prediction $L(\phi)$ in the residual/heart-beat signal space. Its bandwidth $\sigma_{L}$ is set equal to a constant $k_L = 2.0$ times the robust estimate of standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit as described in Section~\ref{sec:method:gating}.
 
 	A representative single-cycle video of the subject's heart-beat can now be reconstructed by sampling the manifold $M(\phi)$ at any desired resolution from the range $[0, 1)$ of the cardiac phase. Note that this approach will facilitate temporal super-resolution only if the set of images observed in each distinct period of the given image sequence differ in cardiac phase by some non-zero amount. Also, the amount of temporal super-resolution possible will depend both on the number of cycles captured and the amount by which one can expect the corresponding images to be perturbed in phase across cycles. 
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \section{Results}
 \label{sec:results}
 %
-We use cardiac ultrasound videos and associated ECG recordings of 6 mice to validate the proposed methods. The ultrasound videos were acquired using the VisualSonics Vevo 2100 scanner at 233 frames per second. Furthermore, each video consisted of approximately 300 frames, 11 cardiac cycles, and 2 respiratory cycles.
+We use cardiac ultrasound videos and associated ECG recordings of 6 mice to validate our methods. The ultrasound videos were acquired using the VisualSonics Vevo 2100 scanner at 233 frames per second. Each video consists of approximately 300 frames, 11 cardiac cycles, and 2 respiratory cycles.
 
-	We validate our cardiac phase estimation method by comparing its phase estimates with the ECG signal. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a head-to-head comparison between the ECG signal and the instantaneous cardiac phase obtained using the method described in Section~\ref{sec:method:phase_estimation} for one of the 6 videos. 
-	
-%
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-\begin{tabular}[c]{@{}c@{}}VID\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}$R^2$\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Prediction Error\\ Mean $\pm$ Std\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}VID\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}Correlation \\ $R^2$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS peak prediction error\\ $mean \pm std$\end{tabular} \\ \hline
 1 & 0.9995 & 1.55 $\pm$ 0.89 \\ \hline
 2 & 0.9995 & 1.36 $\pm$ 1.15 \\ \hline
 3 & 0.9996 & 1.45 $\pm$ 0.89 \\ \hline
@@ -176,15 +174,20 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 5 & 0.9990 & 2.09 $\pm$ 1.78 \\ \hline
 6 & 0.9992 & 1.40 $\pm$ 1.74 \\ \hline
 \end{tabular}
-\caption{Comparision between frame positions of QRS peaks in the ECG signal and the corresponding minima of the cardiac phase estimated using our method for 6 videos}
+\caption{Comparision between frame positions of QRS peaks in the ECG signal and the corresponding minima of the estimated cardiac phase for 6 videos}
 \label{table:phase_estimation}
 \end{table}
+	We validate our cardiac phase estimation method by comparing its phase estimates with the ECG signal which is the gold standard for cardiac gating. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a head-to-head comparison between the ECG signal and the instantaneous cardiac phase signal obtained using the method described in Section~\ref{sec:method:phase_estimation} for one of the 6 videos. Notice how well the locations of the peaks of the QRS complex (red circles) in the ECG signal and the corresponding minima (black circles) of the cardiac phase signal in each cycle match. Table 1 reports the $R^2$ correlation and the $mean \pm std$ error between the locations of the QRS peaks and the corresponding minima of the cardiac phase signals for all 6 videos in our dataset. Figure~\ref{fig:instaphase_vs_ecg}(b) shows a head-to-head comparison of five video frames evenly spaced in time between two consecutive QRS peaks (top-row) and corresponding minima of the cardiac phase signal (bottom-row). Notice the high-level of similarity in the images of each column.  Figure~\ref{fig:phase_ordering}(b,c) shows the frames of an m-mode line before and after ordering with the estimated cardiac phase. Figure~\ref{fig:phase_ordering}(d) shows the phase-ordered m-mode frames after performing respiratory gating as described in Section~\ref{sec:method:gating}. 
+	
+	We validate the accuracy of our kernel regression model for reconstructing the image at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly exclude one of the non-respiratory frames in the video, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the excluded frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column in Table~\ref{table:image_reconstruction} shows the mean and standard deviation of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for each of the 6 videos in our dataset. As a baseline, the third column of  Table~\ref{table:image_reconstruction} shows the mean and standard deviation of the normalized correlation between frames at QRS peaks of the ECG signal for each video. 
+	
+	We encourage the readers to watch the supplementary videos for a better assessment of the results of the proposed methods.
 %
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-\begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50) NCORR\\ Mean $\pm$ Std\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frame NCORR\\ Mean $\pm$ Std\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50) NCORR\\ $mean \pm std$\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frame NCORR\\ $mean \pm std$\end{tabular} \\ \hline
 1 & 0.8562 $\pm$ 0.0366 & 0.7981 $\pm$ 0.0532 \\ \hline
 2 & 0.8558 $\pm$ 0.0525 & 0.7877 $\pm$ 0.0503 \\ \hline
 3 & 0.8592 $\pm$ 0.0348 & 0.7849 $\pm$ 0.0457 \\ \hline
@@ -192,20 +195,20 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 5 & 0.8655 $\pm$ 0.0312 & 0.8196 $\pm$ 0.0476 \\ \hline
 6 & 0.8736 $\pm$ 0.0278 & 0.8270 $\pm$ 0.0778 \\ \hline
 \end{tabular}
-\caption{My caption}
+\caption{Evaluation of our kernel regression model for reconstructing the image at any cardiac phase using 50 rounds of Leave one out cross-validation (LOOCV)}
 \label{table:image_reconstruction}
 \end{table}
 %
 
 %
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \section{Discussion and future work}
 \label{sec:discussion}
 %
 
 
 %
-%\vspace{-0.5cm}
+\vspace{-0.3cm}
 \bibliographystyle{splncs03}
 \bibliography{library}
 \end{document}
