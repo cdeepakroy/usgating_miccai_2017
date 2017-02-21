@@ -9,6 +9,8 @@
 \usepackage{wrapfig}
 %
 \newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg}\operatorname{min}}\;}
+\setlength{\belowcaptionskip}{-15pt}
+\setlength{\abovecaptionskip}{-2pt}
 %
 \mathchardef\mhyphen="2D
 \raggedbottom 
@@ -48,23 +50,23 @@
 \maketitle
 
 \begin{abstract}
-In this paper, we present a novel purely image-based method for the estimation of instantaneous cardiac and respiratory phases from cardiac ultrasound videos and demonstrate its utility in gating and temporal super-resolution. We first use a novel strategy based on inter-frame similarity to transform the complex high-dimensional image sequence into a 1D time series with the same periodicity characteristics.  Next, we use a trend extraction technique to decompose this time series into a trend component encoding respiratory motion alone and a residual component encoding the beating heart motion alone. Next, we use the Hilbert transform to estimate the instantaneous cardiac and respiratory phases of each frame from these components. Next, we present a robust non-parametric regression technique that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion. Lastly, we use a kernel regression with a novel kernel to learn an image manifold parameterized by instantaneous cardiac phase that can be sampled to generate a single-cycle video at a higher temporal-resolution. We demonstrate and validate our methods using cardiac ultrasound videos and associated ECG recordings of 6 mice.
+In this paper, we present a novel purely image-based method for the estimation of instantaneous cardiac and respiratory phases from cardiac ultrasound videos and demonstrate its utility in gating and temporal super-resolution. We first use a novel strategy based on inter-frame similarity to transform the complex high-dimensional image sequence into a 1D time series with the same periodicity characteristics.  Next, we use a trend extraction technique to decompose this time series into a trend component encoding respiratory motion alone and a residual component encoding the beating heart motion alone. Next, we use the Hilbert transform to estimate the instantaneous cardiac and respiratory phases of each frame from these components. Next, we present a robust non-parametric regression technique that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion. Lastly, we use a kernel regression method with a novel kernel to learn an image manifold parameterized by instantaneous cardiac phase that can be sampled to generate a single-cycle video at a higher temporal-resolution. We demonstrate and validate our methods using 2D cardiac ultrasound videos and associated ECG recordings of 6 mice.
 %\keywords{Cardiac, Ultrasound, Phase estimation, Gating, Temporal super-resolution}
 \end{abstract}
-
-%\vspace{-0.5cm}
+%
+\vspace{-0.5cm}
 \section{Introduction}
 \label{sec:intro}
 %
-Cardiovascular disease is the leading cause of death worldwide and ultrasound is emerging as an increasingly effective tool for rapid non-invasive visual assessment of cardiac structure and function. Two kinds of periodic motion are present in cardiac ultrasound videos, one that corresponds to the beating heart motion and the other that corresponds to respiratory motion. Knowing the phase or location of each video frame within the cardiac and/or respiratory cycles is essential in a variety of applications. 
-Cardiac motion is usually tracked by simultaneously acquiring an ECG signal and respiratory motion is tracked through the motion of markers placed on the subject's body.
-%
+Cardiovascular disease is the leading cause of death worldwide and ultrasound is emerging as an increasingly effective tool for rapid non-invasive visual assessment of cardiac structure and function. Cardiac ultrasound videos consists of two kinds of periodic motion, one that corresponds to the beating heart motion and the other that corresponds to respiratory motion. Knowing the phase or location of each video frame within the cardiac and/or respiratory cycles is essential in a variety of applications such as gating, quiescence detection, 3D reconstruction, and robotic beating heart surgery\cite{VonBirgelen1997,Wick2013,Wachinger2012,Kurz2015}. Typically, the position within the cardiac cycle is tracked through ECG data and the position within respiratory cycle is tracked by motion of markers placed on the subject's body\cite{Khamene2004}. 
 
+	In this paper, we present a novel method that estimates the instantaneous cardiac and respiratory phases directly from the images of the cardiac ultrasound video. We also present a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression to reconstruct images at any cardiac phase to facilitate temporal super-resolution.	
+%
 \vspace{-0.3cm}
 \section{Method}
 \label{sec:method}
 %
-In this section, we present the theory underlying the proposed methods for instantaneous phase estimation, gating and temporal super-resolution of cardiac ultrasound videos. Specifically, we begin by describing our method for the estimation of instantaneous cardiac and respiratory phases in Section \ref{sec:method:phase_estimation}. We then present a robust method that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion in Section \ref{sec:method:gating}. Finally, in Section \ref{sec:method:super_resolution}, we present a kernel regression method that uses the phase-tagged image sequence to reconstruct a single-period video at higher-temporal resolution. 
+In this section, we present the theory underlying the proposed methods for instantaneous phase estimation, gating and temporal super-resolution of cardiac ultrasound videos. Specifically, we begin by describing our method for the estimation of instantaneous cardiac and respiratory phases in Section \ref{sec:method:phase_estimation}. We then present a robust method that uses these phase estimates to gate out video frames predominantly influenced by respiratory motion in Section \ref{sec:method:gating}. Finally, in Section \ref{sec:method:super_resolution}, we present a kernel regression model to generate the image at any cardiac phase that can be used to achieve temporal super-resolution.
 %
 %
 \begin{IonFigT}
@@ -99,7 +101,7 @@ In this section, we present the theory underlying the proposed methods for insta
 \label{fig:phase_estimation}
 \end{IonFigT}
 %
-While there have been numerous efforts for the estimation of instantaneous phase and/or frequency in periodic univariate time series data (wherein a single-variable is measured at each time point)\cite{Boashash1992,Lu2013,Luo2003}, there are not many methods that tackle this problem in a multivariate setting which is the case with periodic cardiac ultrasound videos wherein several thousands of variables (pixel intensities) could be measured at each time point. Our strategy was to find a way to simplify this complex multi-variate problem by transforming it into a univariate one and take advantage of existing univariate methods to solve the problem. 
+While there have been numerous efforts for the estimation of instantaneous phase and/or frequency in periodic univariate time series data\cite{Boashash1992,Lu2013,Luo2003}, there are not many methods that tackle this problem in a multivariate setting such as the case of periodic cardiac ultrasound videos wherein several thousands of variables (pixel intensities) could be measured at each time point. Our strategy was to find a way to transforming this complex multi-variate problem into a univariate one and take advantage of existing univariate methods to solve the problem. 
 
 	We first compute the similarity between all pairs of frames in the given periodic image sequence containing $N$ images/frames to create a matrix $A \in R^{N \times N}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ frames of the given sequence. Here in, we use normalization correlation also known as the Pearson correlation coefficient to quantify inter-frame similarity but, in principle, any of the similarity metrics used in image registration algorithms \cite{Goshtasby2012} can potentially be chosen. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series that measures the similarity of the corresponding frame in the image sequence with all other frames. If the similarity metric is chosen with care and if the corresponding frame is not significantly corrupted we can expect this time series to encompass the predominant periodicity characteristics of the original image sequence. Two kinds of periodic motion are present in cardiac ultrasound videos, one corresponding to the beating heart motion and the other corresponding to respiratory motion. Figure \ref{fig:phase_estimation}(a) shows the inter-frame similarity matrix of one of our cardiac ultrasound videos computed using the normalized correlation metric wherein these two sources of periodicity can be clearly observed in many rows/columns. 
 
