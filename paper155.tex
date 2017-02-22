@@ -169,25 +169,26 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 %
 %
 \begin{table}[t]
-\begin{minipage}[b]{0.45\linewidth}
+\begin{minipage}[t]{0.45\linewidth}
 \centering
 \caption{Comparision between frame positions of the QRS peaks in ECG signal and the corresponding minima of the estimated cardiac phase for 6 videos.}
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-\begin{tabular}[c]{@{}c@{}}VID\\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}Correlation \\ $R^2$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS peak prediction\\ $mean \pm std \; error$\end{tabular} \\ \hline
-1 & 0.9995 & 1.55 $\pm$ 0.89 \\ \hline
-2 & 0.9995 & 1.36 $\pm$ 1.15 \\ \hline
-3 & 0.9996 & 1.45 $\pm$ 0.89 \\ \hline
-4 & 0.9998 & 0.73 $\pm$ 0.62 \\ \hline
-5 & 0.9990 & 2.09 $\pm$ 1.78 \\ \hline
-6 & 0.9992 & 1.40 $\pm$ 1.74 \\ \hline
+\multicolumn{1}{|l|}{} & \multicolumn{2}{l|}{QRS peak frame identification} \\ \hline
+VID & $R^2$ & $mean \pm std \; error$ \\ \hline
+1 & \; 0.9995 \; & 1.55 $\pm$ 0.89 \\ \hline
+2 & \; 0.9995 \; & 1.36 $\pm$ 1.15 \\ \hline
+3 & \; 0.9996 \; & 1.45 $\pm$ 0.89 \\ \hline
+4 & \; 0.9998 \; & 0.73 $\pm$ 0.62 \\ \hline
+5 & \; 0.9990 \; & 2.09 $\pm$ 1.78 \\ \hline
+6 & \; 0.9992 \; & 1.40 $\pm$ 1.74 \\ \hline
 \end{tabular}
 \label{table:phase_estimation}
 \end{minipage}
 %
 \hspace{0.5cm}
 %
-\begin{minipage}[b]{0.45\linewidth}
+\begin{minipage}[t]{0.45\linewidth}
 \caption{Evaluation of our kernel regression model for reconstructing images at any cardiac phase using 50 rounds of Leave one out cross-validation (LOOCV) for 6 videos.}
 \centering
 \begin{tabular}{|c|c|c|}
