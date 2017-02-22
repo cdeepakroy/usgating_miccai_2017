@@ -110,7 +110,7 @@ While there have been numerous efforts for the estimation of instantaneous phase
 \argmin{\tau_{resp}(t)} \left[ \sum_{t=1}^{N}  \left(u(t) - \tau_{resp}(t) \right)^2  + \lambda \sum_{t=1}^{N-1} \left( \nabla^2 \tau_{resp}(t) \right)^2 \right] 
 \end{equation}
 where $\nabla^2\tau_{resp}(t) = \tau_{resp}(t+1) - 2 \tau_{resp}(t) + \tau_{resp}(t-1)$ is the second-order difference or derivative of the trend signal and $\lambda=6400$ is penalty parameter. Let $A_{resp}$ and $A_{heart}$ be the matrices whose rows contain the trend/respiratory and residual/heart-beat components, respectively, of the frame similarity signals in the corresponding rows of the similarity matrix $A$. Figures~\ref{fig:phase_estimation}(b,c) show the trend $A_{resp}$ and residual $A_{heart}$ matrices for one of our cardiac ultrasound videos. To minimize the effect of any noise on phase estimation, we pick frame similarity signal corresponding to the row of $A_{heart}$ whose periodogram or power-frequency distribution has minimum entropy. Let $\hat{u}(t)$ be the chosen frame similarity signal and let $\hat{\tau}_{resp}(t)$ and $\hat{r}_{heart}(t)$  be its associated trend/respiration and residual/heart-beat component signals, respectively. Figure~\ref{fig:phase_estimation}(d) shows the selected frame similarity signal (blue) along with the associated trend/respiration (pink) and residual/heart-beat (green) components. Figure~\ref{fig:phase_estimation}(e) shows the periodogram of these two components that are nicely segregated in frequency domain. The periodicity characteristics (e.g. frequency in beats-per-minute (bpm), cycle duration in frames, number of cycles) of heart-beat and respiration can be calculated based on the maximum-power frequency of their periodograms.
-		
+
 	Next, considering the narrow-band nature of the respiration and heart-beat signals (see  Figure~\ref{fig:phase_estimation}(e)), we use the Hilbert transform~\cite{Lu2013} to estimate the instantaneous phase of each frame. Specifically, we compute the instantaneous intra-period phase $\phi(t) \in \left [  -\pi, \pi\right )$ of a periodic time series $x(t)$ using its Hilbert transform $H_x(t)$ as follows: $\phi(t) = arctan \left( \frac{H_x(t)}{x(t)}\right)$ and map $\phi(t)$ from the range $\left [  -\pi, \pi\right )$ to $\left [  0, 1\right )$. Let $\hat{\phi}_{heart}(t)$ and $\hat{\phi}_{resp}(t)$ denote the instantaneous cardiac and respiratory phases computed from the trend/respiration $\hat{\tau}_{resp}(t)$ and residual/heart-beat $\hat{r}_{heart}(t)$ signals, respectively. Figure~\ref{fig:phase_estimation}(f) shows the instantaneous cardiac and respiratory phases computed from the heart-beat and respiration signals in Figure~\ref{fig:phase_estimation}(d). 
 %
 \vspace{-0.5cm}
@@ -136,16 +136,6 @@ Once the cardiac and respiratory phases of each frame have been estimated, they 
 	
 	In the second step, we learn a robust mapping $L(\phi) : \left [  0, 1\right ) \to R$ from cardiac phase to the residual/heart-beat component of the frame similarity signal by fitting a robust non-parametric regression model called Locally weighted regression (LOWESS) to the dataset $\left \{ \left(\hat{\phi}_{heart}(t), \hat{r}_{heart}(t) \right) \mid t \notin F_{cutoff}  \right \}$ containing the pair of the cardiac phase $\hat{\phi}_{heart}(t)$ and residual/heart-beat $\hat{r}_{heart}(t)$ signal values of all frames that do not belong to the set of frames $F_{cutoff}$ discarded in the first step above. Next, we compute a robust estimate of the standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit based on the median absolute value of the difference between the LOWESS fit $L( \hat{\phi}_{heart}(t) )$ and residual/heart-beat signal $\hat{r}_{heart}(t)$ for all frames. Lastly, we gate out all frames $F_{resp} = \left \{ t \; \big\lvert \; \lvert L( \hat{\phi}_{heart}(t) ) - \hat{r}_{heart}(t)  \rvert   > k \times \hat{\sigma}_{L}  \right \}$ for which the absolute  difference between the LOWESS fit and heart-beat signal value is greater than $k = 2.0$ (95\% confidence interval) times the standard deviation $\hat{\sigma}_{L}$.	
 %
-\begin{IonFigT}
-\centering
-%
-\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
-\ionbox{1.2in}\ionbox{1.1in}\ionbox{1.1in}\ionbox{1.1in}\\
-%
-\caption{Visualization of m-mode frames ordered by cardiac phase: (a) One of the frames in the video overlaid with the M-mode line shown in the next three images, (b) M-mode frames in the order they appear in the input video, (c) M-mode frames ordered by cardiac phase, and (d) Non-respiratory m-mode frames ordered by cardiac phase.}
-\label{fig:phase_ordering}
-\end{IonFigT}
-%
 \vspace{-0.5cm}
 \subsection{Model to generate images by cardiac phase for super-resolution}
 \label{sec:method:super_resolution}
@@ -157,6 +147,19 @@ Given a cardiac ultrasound video $I(t) : \{1, ..., N\} \to R^m$ of $N$ images wi
 M(\phi) = \frac{\sum_{t = 1}^{N} K \left( \phi, \hat{\phi}_{heart}(t) \right) I(t)}{\sum_{t = 1}^{n} K \left( \phi, \hat{\phi}_{heart}(t) \right)} 
 \end{equation}
 where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ \mid \phi - \hat{\phi}_{heart}(t) \mid^2}{2  \sigma^2_\phi} \right \} \times exp\left \{ -\frac{ \mid L(\phi) - \hat{r}_{heart}(t) \mid^2}{2  \sigma^2_{L}} \right \}$ is defined as the product of two radial-basis function (RBF) kernels. The first RBF kernel  weighs images inversely proportional to their distance (accounting for periodicity) in the cardiac phase space. Its bandwidth $\sigma_\phi$ is set equal to a constant $k_\phi = 0.4$ times the median difference in cardiac phase between consecutive frames of the given image sequence. The second RBF kernel weighs images inversely proportional to their deviation from the LOWESS prediction $L(\phi)$ in the residual/heart-beat signal space. Its bandwidth $\sigma_{L}$ is set equal to a constant $k_L = 2.0$ times the robust estimate of standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit as described in Section~\ref{sec:method:gating}. A single-cycle video representative of the subject's heart-beat can now be reconstructed by sampling the manifold $M(\phi)$ at any desired resolution. 
+%
+%
+\begin{IonFigT}
+\centering
+%
+\includegraphics[width=4.5in]{figures/decoded/2015-07-27-10-36-06_2015-07-15-16-56-16_1.raw.bmode/phaseordered.png}
+\ionbox{1.2in}\ionbox{1.1in}\ionbox{1.1in}\ionbox{1.1in}\\
+%
+\caption{Visualization of m-mode frames ordered by cardiac phase: (a) One of the frames in the video overlaid with the M-mode line shown in the next three images, (b) M-mode frames in the order they appear in the input video, (c) M-mode frames ordered by cardiac phase, and (d) Non-respiratory m-mode frames ordered by cardiac phase.}
+\label{fig:phase_ordering}
+\end{IonFigT}
+%
+%
 \vspace{-0.5cm}
 \section{Results}
 \label{sec:results}
