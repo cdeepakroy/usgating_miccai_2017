@@ -62,7 +62,7 @@ Cardiovascular disease is the leading cause of death worldwide and ultrasound is
 
 	In this paper, we present a novel method that estimates the instantaneous cardiac and respiratory phases directly from the the cardiac ultrasound video. We also present a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression to reconstruct images at any cardiac phase to facilitate temporal super-resolution.	
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \section{Method}
 \label{sec:method}
 %
@@ -81,7 +81,7 @@ In this section, we present the theory underlying the proposed methods for insta
 \caption{Illustration of correspondence between ECG and the instantaneous cardiac phase estimated using our method: (a) ECG signal (blue) and the cardiac phase estimated using our method overlaid with peaks of the QRS complex (red circle) and the corresponding cardiac phase minima (black circle), (b) Five video frames evenly spaced in time between the first and second QRS peaks of the ECG signal (top-row) and the corresponding cardiac phase minima (bottom-row) constituting one cardiac cycle.}
 \label{fig:instaphase_vs_ecg}
 \end{IonFigT}
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \subsection{Estimation of instantaneous cardiac and respiratory phases}
 \label{sec:method:phase_estimation}
 %
@@ -113,7 +113,7 @@ where $\nabla^2\tau_{resp}(t) = \tau_{resp}(t+1) - 2 \tau_{resp}(t) + \tau_{resp
 		
 	Next, considering the narrow-band nature of the respiration and heart-beat signals (see  Figure~\ref{fig:phase_estimation}(e)), we use the Hilbert transform~\cite{Lu2013} to estimate the instantaneous phase of each frame. Specifically, we compute the instantaneous intra-period phase $\phi(t) \in \left [  -\pi, \pi\right )$ of the periodic time series $x(t)$ using its Hilbert transform $H_x(t)$ as follows: $\phi(t) = arctan \left( \frac{H_x(t)}{x(t)}\right)$ and map $\phi(t)$ from the range $\left [  -\pi, \pi\right )$ to $\left [  0, 1\right )$. Let $\hat{\phi}_{heart}(t)$ and $\hat{\phi}_{resp}(t)$ denote the instantaneous cardiac and respiratory phases computed from the trend/respiration $\hat{\tau}_{resp}(t)$ and residual/heart-beat $\hat{r}_{heart}(t)$ signals, respectively. Figure~\ref{fig:phase_estimation}(f) shows the instantaneous cardiac and respiratory phases computed from the heart-beat and respiration signals in Figure~\ref{fig:phase_estimation}(d). 
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \subsection{Gating out respiratory frames}
 \label{sec:method:gating}
 %
@@ -146,7 +146,7 @@ Once the cardiac and respiratory phases of each frame have been estimated, it ca
 \label{fig:phase_ordering}
 \end{IonFigT}
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \subsection{Model to generate images by cardiac phase for super-resolution}
 \label{sec:method:super_resolution}
 %
@@ -156,10 +156,8 @@ Given a cardiac ultrasound video $I(t) : \{1, ..., N\} \to R^m$ of $N$ images wi
 \begin{equation}
 M(\phi) = \frac{\sum_{t = 1}^{N} K \left( \phi, \hat{\phi}_{heart}(t) \right) I(t)}{\sum_{t = 1}^{n} K \left( \phi, \hat{\phi}_{heart}(t) \right)} 
 \end{equation}
-where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ \mid \phi - \hat{\phi}_{heart}(t) \mid^2}{2  \sigma^2_\phi} \right \} \times exp\left \{ -\frac{ \mid L(\phi) - \hat{r}_{heart}(t) \mid^2}{2  \sigma^2_{L}} \right \}$ is defined as the product of two radial-basis function (RBF) kernels. The first RBF kernel  weighs images inversely proportional to their distance (accounting for periodicity) in the cardiac phase space. Its bandwidth $\sigma_\phi$ is set equal to a constant $k_\phi = 0.4$ times the median difference in cardiac phase between consecutive frames of the given image sequence. The second RBF kernel weighs images inversely proportional to their deviation from the LOWESS prediction $L(\phi)$ in the residual/heart-beat signal space. Its bandwidth $\sigma_{L}$ is set equal to a constant $k_L = 2.0$ times the robust estimate of standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit as described in Section~\ref{sec:method:gating}.
-
-	A representative single-cycle video of the subject's heart-beat can now be reconstructed by sampling the manifold $M(\phi)$ at any desired resolution from the range $[0, 1)$ of the cardiac phase. Note that this approach will facilitate temporal super-resolution only if the set of images observed in each distinct period of the given image sequence differ in cardiac phase by some non-zero amount. Also, the amount of temporal super-resolution possible will depend both on the number of cycles captured and the amount corresponding images are perturbed in phase across cycles. 
-\vspace{-0.3cm}
+where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ \mid \phi - \hat{\phi}_{heart}(t) \mid^2}{2  \sigma^2_\phi} \right \} \times exp\left \{ -\frac{ \mid L(\phi) - \hat{r}_{heart}(t) \mid^2}{2  \sigma^2_{L}} \right \}$ is defined as the product of two radial-basis function (RBF) kernels. The first RBF kernel  weighs images inversely proportional to their distance (accounting for periodicity) in the cardiac phase space. Its bandwidth $\sigma_\phi$ is set equal to a constant $k_\phi = 0.4$ times the median difference in cardiac phase between consecutive frames of the given image sequence. The second RBF kernel weighs images inversely proportional to their deviation from the LOWESS prediction $L(\phi)$ in the residual/heart-beat signal space. Its bandwidth $\sigma_{L}$ is set equal to a constant $k_L = 2.0$ times the robust estimate of standard deviation/dispersion $\hat{\sigma}_{L}$ of non-respiratory frames around the LOWESS fit as described in Section~\ref{sec:method:gating}. A single-cycle video representative of the subject's heart-beat can now be reconstructed by sampling the manifold $M(\phi)$ at any desired resolution. 
+\vspace{-0.5cm}
 \section{Results}
 \label{sec:results}
 %
@@ -204,16 +202,17 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 \end{tabular}
 \label{table:image_reconstruction}
 \end{minipage}
+\vspace{-0.3cm}
 \end{table}
 %
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \section{Conclusion}
 \label{sec:conclusion}
 %
 In this paper, we have presented a novel method to estimate the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video. We have also presented a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. Having demonstrated a proof of concept, we next plan to evaluate our methods on more datasets, especially of subjects with irregular heart beats, and address any remaining pitfalls. One drawback of our phase estimation method is a strong assumption of periodicity which may breakdown in the case of subjects with cardiac arrhythmia. To address this, we will look into generalizations of the hilbert transform\cite{Lu2013} that are more susceptible noise. Another drawback is that the use normalized correlation to measure inter-frame similarity relies on an inherent assumption that a large part of the image is pulsating. To relax this, we will try to devise more sophisticated local patch-based similarity measures.
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \bibliographystyle{splncs03}
 \bibliography{library}
 \end{document}
