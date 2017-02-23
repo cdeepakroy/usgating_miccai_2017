@@ -62,9 +62,9 @@ Cardiovascular disease is the leading cause of death worldwide and ultrasound is
 
 	In this paper, we present a novel method that estimates the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video. We also present a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. 
 	
-	Previous work on estimation of cardiac and/or respiratory phases directly from ultrasound videos is very limited. In~\cite{Karadayi2006}, the authors compute a signal of the x- or y-coordinate of the center-of-mass of each frame, use bandpass filtering to remove components outside the cardiac frequency range, and apply matched sine/cosine filters to estimate the instantaneous phase. In~\cite{Sundar2009}, the authors compute a signal of phase correlation between consecutive frames and use an approach similar to~\cite{Karadayi2006} to recover the cardiac and respiratory signals. The center-of-mass signals are not reliable and phase correlation finds global translation that does not model beating heart and out-of-plane motion well.
+	Previous work on the estimation of cardiac and/or respiratory phases directly from ultrasound videos is very limited. In~\cite{Karadayi2006}, the authors compute a signal of the x- or y-coordinate of the center-of-mass of each frame, use bandpass filtering to remove components outside the cardiac frequency range, and apply matched sine/cosine filters to estimate the instantaneous phase. In~\cite{Sundar2009}, the authors compute a signal of phase correlation between consecutive frames and use an approach similar to~\cite{Karadayi2006} to recover the cardiac and respiratory signals. The center-of-mass signals are not reliable and phase correlation finds global translation that does not model beating and out-of-plane motion of the heart well.
 %
-\vspace{-0.3cm}
+\vspace{-0.9cm}
 \section{Method}
 \label{sec:method}
 \vspace{-0.3cm}
@@ -171,7 +171,7 @@ where kernel $K\left( \phi, \hat{\phi}_{heart}(t) \right) = exp\left \{ -\frac{ 
 %
 We use cardiac ultrasound videos and associated ECG recordings of 6 mice to validate our methods. The ultrasound videos were acquired using the VisualSonics Vevo 2100 scanner at 233 frames per second. Each video consists of approximately 300 frames, 11 cardiac cycles, and 2 respiratory cycles.
 
-	We validate the cardiac phase estimates of our method by comparing them with the ECG signal which is the gold standard for cardiac gating. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a head-to-head comparison between the ECG signal and the estimated cardiac phase signal for one of the 6 videos. Notice how well the locations of the QRS peaks (red circles) in the ECG signal and the corresponding minima (black circles) of the cardiac phase signal in each cycle match. Table 1 reports the $R^2$ correlation and the $mean \pm std$ error between the locations of the QRS peaks and the corresponding minima of the cardiac phase signals for all 6 videos. Figure~\ref{fig:instaphase_vs_ecg}(b) presents a visual comparison of five video frames evenly spaced in time between two consecutive QRS peaks (top-row) and corresponding minima of the cardiac phase signal (bottom-row). Figure~\ref{fig:phase_ordering}(b,c) shows frames of an m-mode line before and after ordering with the estimated cardiac phase. Figure~\ref{fig:phase_ordering}(d) shows m-mode frames ordered by cardiac phase after gating out respiratory frames. The supplementary material includes a video showing the estimated cardiac and respiratory phases of each frame for one of our datasets.
+	We validate the cardiac phase estimates of our method by comparing them with the ECG signal which is the gold standard for cardiac gating. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a comparison between the ECG signal and the estimated cardiac phase signal for one of the 6 videos. Notice how well the locations of the QRS peaks in the ECG signal and the corresponding minima of the cardiac phase signal in each cycle match. Table 1 reports the $R^2$ correlation and the $mean \pm std$ error between the locations of the QRS peaks and the corresponding minima of the cardiac phase signals for all 6 videos. Figure~\ref{fig:instaphase_vs_ecg}(b) presents a visual comparison of five video frames evenly spaced in time between two consecutive QRS peaks (top-row) and corresponding minima of the cardiac phase signal (bottom-row). Figure~\ref{fig:phase_ordering} shows frames of an m-mode line through the ventricle before and after ordering by cardiac phase. The supplementary material includes a video showing the cardiac and respiratory phases of each frame for one of our datasets.
 	
 	We validate the accuracy of our kernel regression model for reconstructing images at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly exclude one of the non-respiratory frames in the video, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the excluded frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column of Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for all 6 videos. As a baseline, the third column of  Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of the normalized correlation between frames at QRS peaks of the ECG signal. The supplementary material includes single-cycle videos at 2x and 4x temporal resolution generated using the kernel regression model wherein the motion of heart chambers and valves is much clear than the original video. 
 %
@@ -180,6 +180,7 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 \begin{minipage}[t]{0.45\linewidth}
 \centering
 \caption{Match between frame positions of QRS peaks in ECG signal and corresponding cardiac phase minima.}
+\vspace{-0.1cm}
 \begin{tabular}{|c|c|c|}
 \hline
 \multicolumn{1}{|l|}{} & \multicolumn{2}{l|}{QRS peak frame identification} \\ \hline
@@ -199,6 +200,7 @@ VID & $R^2$ & $mean \pm std \; error$ \\ \hline
 \begin{minipage}[t]{0.45\linewidth}
 \centering
 \caption{Evaluation of our kernel regression model Leave one out cross-validation (LOOCV) of 50 rounds.}
+\vspace{-0.1cm}
 \begin{tabular}{|c|c|c|}
 \hline
 \begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50)\\ $mean \pm std \; ncorr$\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frames\\ $mean \pm std \; ncorr$\end{tabular} \\ \hline
@@ -211,11 +213,11 @@ VID & $R^2$ & $mean \pm std \; error$ \\ \hline
 \end{tabular}
 \label{table:image_reconstruction}
 \end{minipage}
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \end{table}
 %
 %
-\vspace{-0.3cm}
+\vspace{-0.5cm}
 \section{Conclusion}
 \label{sec:conclusion}
 \vspace{-0.3cm}
