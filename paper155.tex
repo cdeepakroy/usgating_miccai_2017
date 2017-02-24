@@ -7,6 +7,12 @@
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{wrapfig}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage[font=small,labelfont=bf]{caption}
+
+\newcommand{\rk}[1]{{\color{red}{#1}}}
+
 %
 \newcommand{\argmin}[1]{\underset{#1}{\operatorname{arg}\operatorname{min}}\;}
 \setlength{\belowcaptionskip}{-15pt}
@@ -58,19 +64,22 @@ Ultrasound is emerging as an increasingly effective tool for rapid non-invasive 
 \section{Introduction}
 \label{sec:intro}
 %
-Cardiovascular disease is the leading cause of death worldwide and ultrasound is emerging as an increasingly effective tool for rapid non-invasive assessment of cardiac structure and function. Cardiac ultrasound videos consist of two kinds of periodic motion, one corresponding to beating heart motion and the other corresponding to respiratory motion. Knowledge of the phase or location of each video frame within the cardiac and/or respiratory cycles is essential in a variety of applications such as gating\cite{VonBirgelen1997}, quiescence detection~\cite{Wick2013}, 3D reconstruction~\cite{Wachinger2012}, and temporal super-resolution~\cite{Cherin2006}. These tasks are particularly challenging in pre-clinical studies involving small animals such as mice that have rapid heart (310-840 BPM) and respiration (80-230 BPM) rates. Typically, the position within cardiac cycle is tracked through ECG data and position within respiratory cycle is tracked by motion of markers placed on the subject's body\cite{Khamene2004}. 
+Cardiovascular disease is the leading cause of death worldwide and ultrasound is emerging as an increasingly effective tool for rapid non-invasive assessment of cardiac structure and function. Cardiac ultrasound videos consist of two kinds of periodic motion, one corresponding to beating heart motion and the other corresponding to respiratory motion. Knowledge of the phase or location of each video frame within the cardiac and/or respiratory cycles is essential in a variety of applications such as gating \cite{VonBirgelen1997}, quiescence detection~\cite{Wick2013}, 3D reconstruction~\cite{Wachinger2012}, and temporal super-resolution~\cite{Cherin2006}. These tasks are particularly challenging in pre-clinical studies involving small animals such as mice that have rapid heart (310-840 BPM) and respiration (80-230 BPM) rates. Typically, the position within cardiac cycle is tracked through ECG data and position within \rk{the} respiratory cycle is tracked by motion of markers placed on the subject's body \cite{Khamene2004}. 
 
-	In this paper, we present a novel method that estimates the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video. We also present a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. 
-	
-	Previous work on the estimation of cardiac and/or respiratory phases directly from ultrasound videos is very limited. In~\cite{Karadayi2006}, the authors compute a signal of the x- or y-coordinate of the center-of-mass of each frame, use bandpass filtering to remove components outside the cardiac frequency range, and apply matched sine/cosine filters to estimate the instantaneous phase. In~\cite{Sundar2009}, the authors compute a signal of phase correlation between consecutive frames and use an approach similar to~\cite{Karadayi2006} to recover the cardiac and respiratory signals. The center-of-mass signals are not reliable and phase correlation finds global translation that does not model beating and out-of-plane motion of the heart well.
-%
-\vspace{-0.9cm}
+\vskip0.5ex
+\noindent
+\rk{\textbf{Contribution.}} In this paper, we present a novel method that estimates the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video. We also present a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. 
+
+\vskip0.5ex
+\noindent
+\rk{\textbf{Related work.}} Previous work estimation of cardiac and/or respiratory phases directly from ultrasound videos is very limited. In~\cite{Karadayi2006}, the authors compute a signal of the x- or y-coordinate of the center-of-mass of each frame, use bandpass filtering to remove components outside the cardiac frequency range, and apply matched sine/cosine filters to estimate the instantaneous phase. In~\cite{Sundar2009}, the authors compute a signal of phase correlation between consecutive frames and use an approach similar to~\cite{Karadayi2006} to recover the cardiac and respiratory signals. The center-of-mass signals are not reliable and phase correlation finds global translation that does not model beating and out-of-plane \rk{heart motion} well.
+
 \section{Method}
 \label{sec:method}
 \vspace{-0.3cm}
 %
 In this section, we present the theory underlying the proposed methods.
-In Section~\ref{sec:method:phase_estimation}, we begin by describing our method for estimation of instantaneous cardiac and respiratory phases. In Section~\ref{sec:method:gating}, we present a robust method to exclude video frames with significant respiratory motion. In Section~\ref{sec:method:super_resolution}, we present a kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution.
+In Section~\ref{sec:method:phase_estimation}, we \rk{describe} our method for estimation of instantaneous cardiac and respiratory phases. In Section~\ref{sec:method:gating}, we present a robust method to exclude video frames with significant respiratory motion. In Section~\ref{sec:method:super_resolution}, we present a kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution.
 %
 %
 \begin{IonFigT}
@@ -107,7 +116,7 @@ In Section~\ref{sec:method:phase_estimation}, we begin by describing our method 
 %
 While there have been numerous efforts for the estimation of instantaneous phase and/or frequency in periodic univariate time series data~\cite{Boashash1992}, there are not many methods that tackle this problem in a multivariate setting such as the case of cardiac ultrasound videos wherein thousands of variables (pixel intensities) are involved. Our strategy is to transform this complex multi-variate problem into a univariate one and take advantage of existing methods to solve the problem. 
 
-	We first compute the similarity between all pairs of images/frames in the given periodic image sequence containing $N$ frames to create a symmetric matrix $A \in R^{N \times N}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ frames. Here in, we use normalized correlation also known as the Pearson correlation coefficient to quantify inter-frame similarity; but in principle, other image similarity metrics can be used. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series. If the similarity metric is chosen with care and if the corresponding frame is not significantly corrupted, this time series will preserve the periodicity characteristics of the original image sequence. Figure \ref{fig:phase_estimation}(a) shows the inter-frame similarity matrix of one of our cardiac ultrasound videos wherein the periodicity of low-frequency respiratory motion and high-frequency beating heart motion can observed. 
+	We first compute the similarity between all pairs of images/frames in the given periodic image sequence containing $N$ frames to create a symmetric matrix $A \in R^{N \times N}$ where in the element $A(i,j)$ is equal to the similarity between the $i^{th}$ and $j^{th}$ \rk{frame}. Here in, we use normalized correlation (also known as the Pearson correlation coefficient) to quantify inter-frame similarity; but in principle, other image similarity metrics can be used. Each row in the inter-frame similarity matrix $A$ can now be seen as a univariate time series. If the similarity metric is chosen with care and if the corresponding frame is not significantly corrupted, this time series will preserve the periodicity characteristics of the original image sequence. Figure \ref{fig:phase_estimation}(a) shows the inter-frame similarity matrix of one of our cardiac ultrasound videos wherein the periodicity of low-frequency respiratory motion and high-frequency beating heart motion can observed. 
 
 	Next, we use a trend extraction technique called the Hodrick-Prescott (HP) filter~\cite{Alexandrov2012} to decompose the frame similarity signal $u^i(t)$ corresponding to each row $i$ of the matrix $A$ into a sum of two components: (i) Trend component $\tau^i_{resp}(t)$ with periodicity characteristic of only respiratory motion, and (ii) Residual component $r^i_{heart}(t)$ with periodicity characteristic of only beating heart motion. The HP filter performs the decomposition of $u^i(t) = \tau^i_{resp}(t) + r^i_{heart}(t)$ by solving the following optimization problem:
 \begin{equation}	
@@ -158,7 +167,7 @@ whose heart-beat signal value deviates from the LOWESS fit by more than $k = 2.0
 %
 In this section, we present a kernel regression model to reconstruct the image at any cardiac phase. This model can then be used to generate a single-cycle video representative of the subject's heart-beat at a higher temporal resolution.
 
-Given a cardiac ultrasound video $I(t) : \{1, ..., N\} \to R^m$ of $N$ images with $m$ pixels each, we extract the heart-beat signal $\hat{r}_{heart}(t)$, estimate the instantaneous cardiac phase $\hat{\phi}_{heart}(t)$ of each frame, and compute the robust LOWESS fit $L(\phi) : \left [  0, 1\right ) \to R$ that maps cardiac phase to the heart-beat signal as described in Sections~\ref{sec:method:phase_estimation} and ~\ref{sec:method:gating}. We then use Nadarya-Watson kernel regression\cite{Bishop2006} to learn a function $M(\phi): [0, 1) \to R^m $ that reconstructs the image for any cardiac phase $\phi$ using a kernel-weighted local average as follows:
+Given a cardiac ultrasound video $I(t) : \{1, ..., N\} \to R^m$ of $N$ images with $m$ pixels each, we extract the heart-beat signal $\hat{r}_{heart}(t)$, estimate the instantaneous cardiac phase $\hat{\phi}_{heart}(t)$ of each frame, and compute the robust LOWESS fit $L(\phi) : \left [  0, 1\right ) \to R$ that maps cardiac phase to the heart-beat signal as described in Sections~\ref{sec:method:phase_estimation} and ~\ref{sec:method:gating}. We then use Nadarya-Watson kernel regression \cite{Bishop2006} to learn a function $M(\phi): [0, 1) \to R^m $ that reconstructs the image for any cardiac phase $\phi$ using a kernel-weighted local average as follows:
 \begin{equation}
 M(\phi) = \frac{\sum_{t = 1}^{N} K \left( \phi, \hat{\phi}_{heart}(t) \right) I(t)}{\sum_{t = 1}^{n} K \left( \phi, \hat{\phi}_{heart}(t) \right)} 
 \end{equation}
@@ -173,14 +182,15 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 
 	We validate the cardiac phase estimates of our method by comparing them with the ECG signal which is the gold standard for cardiac gating. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a comparison between the ECG signal and the estimated cardiac phase signal for one of the 6 videos. Notice how well the locations of the QRS peaks in the ECG signal and the corresponding minima of the cardiac phase signal in each cycle match. Table 1 reports the $R^2$ correlation and the $mean \pm std$ error between the locations of the QRS peaks and the corresponding minima of the cardiac phase signals for all 6 videos. Figure~\ref{fig:instaphase_vs_ecg}(b) presents a visual comparison of five video frames evenly spaced in time between two consecutive QRS peaks (top-row) and corresponding minima of the cardiac phase signal (bottom-row). Figure~\ref{fig:phase_ordering} shows frames of an m-mode line through the ventricle before and after ordering by cardiac phase. The supplementary material includes a video showing the cardiac and respiratory phases of each frame for one of our datasets.
 	
-	We validate the accuracy of our kernel regression model for reconstructing images at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly exclude one of the non-respiratory frames in the video, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the excluded frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column of Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for all 6 videos. As a baseline, the third column of  Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of the normalized correlation between frames at QRS peaks of the ECG signal. The supplementary material includes single-cycle videos at 2x and 4x temporal resolution generated using the kernel regression model wherein the motion of heart chambers and valves is much clear than the original video. 
+	We validate the accuracy of our kernel regression model for reconstructing images at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly exclude one of the non-respiratory frames in the video, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the excluded frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column of Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for all 6 videos. As a \emph{baseline}, the third column of  Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of the normalized correlation between frames at QRS peaks of the ECG signal. The supplementary material includes single-cycle videos at 2x and 4x temporal resolution generated using the kernel regression model wherein the motion of heart chambers and valves is much clear than the original video. 
 %
 %
 \begin{table}[t]
+\begin{small}
 \begin{minipage}[t]{0.45\linewidth}
 \centering
 \caption{Match between frame positions of QRS peaks in ECG signal and corresponding cardiac phase minima.}
-\vspace{-0.1cm}
+%\vspace{-0.1cm}
 \begin{tabular}{|c|c|c|}
 \hline
 \multicolumn{1}{|l|}{} & \multicolumn{2}{l|}{QRS peak frame identification} \\ \hline
@@ -199,8 +209,8 @@ VID & $R^2$ & $mean \pm std \; error$ \\ \hline
 %
 \begin{minipage}[t]{0.45\linewidth}
 \centering
-\caption{Evaluation of our kernel regression model Leave one out cross-validation (LOOCV) of 50 rounds.}
-\vspace{-0.1cm}
+\caption{Evaluation of our kernel regression model. Leave one out cross-validation (LOOCV) of 50 rounds.}
+%\vspace{-0.1cm}
 \begin{tabular}{|c|c|c|}
 \hline
 \begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50)\\ $mean \pm std \; ncorr$\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frames\\ $mean \pm std \; ncorr$\end{tabular} \\ \hline
@@ -214,17 +224,18 @@ VID & $R^2$ & $mean \pm std \; error$ \\ \hline
 \label{table:image_reconstruction}
 \end{minipage}
 \vspace{-0.5cm}
+\end{small}
 \end{table}
 %
 %
 \vspace{-0.5cm}
 \section{Conclusion}
 \label{sec:conclusion}
-\vspace{-0.3cm}
+\vspace{-0.2cm}
 %
-In this paper, we have presented a novel method to estimate the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video, thereby eliminating the need of additional hardware to monitor them in, for example, small animal studies. We have also presented a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. We next plan to evaluate our methods on more datasets and address any remaining pitfalls. One drawback of our phase estimation method is a strong assumption of periodicity which may breakdown in the case of subjects with cardiac arrhythmia. To address this, we will look into univariate methods for phase estimation in quasi-periodic signals that are less susceptible noise. Another drawback is the use of normalized correlation to measure inter-frame similarity relies on an inherent assumption that a large part of the image is pulsating. To relax this, we will try to devise local patch-based similarity measures. 
+In this paper, we have presented a novel method to estimate the instantaneous cardiac and respiratory phases directly from the cardiac ultrasound video, thereby eliminating the need of additional hardware to monitor them in, for example, small animal studies. We have also presented a robust non-parametric regression technique for gating out respiratory frames and a novel kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution. We next plan to evaluate our methods on more datasets and address any remaining pitfalls. One drawback of our phase estimation method is a strong assumption of periodicity which may \rk{fail} in the case of subjects with cardiac arrhythmia. To address this, we will look into univariate methods for phase estimation in quasi-periodic signals that are less susceptible noise. Another drawback is the use of normalized correlation to measure inter-frame similarity relies on an inherent assumption that a large part of the image is pulsating. To relax this, we will try to devise local patch-based similarity measures. 
 %
-\vspace{-0.5cm}
+\vspace{-0.2cm}
 %
 \bibliographystyle{splncs03}
 \bibliography{library}
