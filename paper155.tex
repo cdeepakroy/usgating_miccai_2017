@@ -183,7 +183,7 @@ We use cardiac ultrasound videos and associated ECG recordings of 6 mice to vali
 
 	We validate the cardiac phase estimates of our method by comparing them with the ECG signal which is the gold standard for cardiac gating. Figure~\ref{fig:instaphase_vs_ecg}(a) shows a comparison between the ECG signal and the estimated cardiac phase signal for one of the 6 videos. Notice how well the locations of the QRS peaks in the ECG signal and the corresponding minima of the cardiac phase signal in each cycle match. Table 1 reports the $R^2$ correlation and the $mean \pm std$ error between the locations of the QRS peaks and the corresponding minima of the cardiac phase signals for all 6 videos. Figure~\ref{fig:instaphase_vs_ecg}(b) presents a visual comparison of five video frames evenly spaced in time between two consecutive QRS peaks (top-row) and corresponding minima of the cardiac phase signal (bottom-row). Figure~\ref{fig:phase_ordering} shows frames of an m-mode line through the ventricle before and after ordering by cardiac phase. The supplementary material includes a video showing the cardiac and respiratory phases of each frame for one of our datasets.
 	
-	We validate the accuracy of our kernel regression model for reconstructing images at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly exclude one of the non-respiratory frames in the video, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the excluded frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column of Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for all 6 videos. As a \emph{baseline}, the third column of  Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of the normalized correlation between frames at QRS peaks of the ECG signal. The supplementary material includes single-cycle videos at 2x and 4x temporal resolution generated using the kernel regression model wherein the motion of heart chambers and valves is much clear than the original video. 
+	We validate the accuracy of our kernel regression model for reconstructing images at any cardiac phase using leave-one-out-cross-validation (LOOCV). In each round of cross-validation, we randomly pick one of the non-respiratory frames in the video, exclude the selected frame along with corresponding frames (closest in phase) in each cycle, fit our kernel-regression model on the remaining frames, use the fitted model to reconstruct the image at the cardiac phase of the selected frame, and compute the similarity between the reconstructed and original image using normalized correlation. The second column of Table~\ref{table:image_reconstruction} shows the $mean \pm std$ of normalized correlation between the reconstructed and the original images over 50 rounds of LOCCV for all 6 videos. As a \emph{baseline}, the third column of  Table~\ref{table:image_reconstruction} reports the $mean \pm std$ of the normalized correlation between frames at QRS peaks of the ECG signal showing the effect of noise on similarity. The supplementary material includes single-cycle videos at 2x and 4x temporal resolution generated using the kernel regression model wherein the motion of heart chambers and valves is much clear than the original video. 
 %
 %
 \begin{table}[t]
@@ -215,12 +215,12 @@ VID & $R^2$ & $mean \pm std \; error$ \\ \hline
 \begin{tabular}{|c|c|c|}
 \hline
 \begin{tabular}[c]{@{}c@{}}VID \\ $\;$ \end{tabular} & \begin{tabular}[c]{@{}c@{}}LOOCV (50)\\ $mean \pm std \; ncorr$\end{tabular} & \begin{tabular}[c]{@{}c@{}}QRS Peak Frames\\ $mean \pm std \; ncorr$\end{tabular} \\ \hline
-1 & 0.8562 $\pm$ 0.0366 & 0.7981 $\pm$ 0.0532 \\ \hline
-2 & 0.8558 $\pm$ 0.0525 & 0.7877 $\pm$ 0.0503 \\ \hline
-3 & 0.8592 $\pm$ 0.0348 & 0.7849 $\pm$ 0.0457 \\ \hline
-4 & 0.8713 $\pm$ 0.0348 & 0.8395 $\pm$ 0.0486 \\ \hline
-5 & 0.8655 $\pm$ 0.0312 & 0.8196 $\pm$ 0.0476 \\ \hline
-6 & 0.8736 $\pm$ 0.0278 & 0.8270 $\pm$ 0.0778 \\ \hline
+1 & 0.8546 $\pm$ 0.0365 & 0.7981 $\pm$ 0.0532 \\ \hline
+2 & 0.8386 $\pm$ 0.0460 & 0.7877 $\pm$ 0.0503 \\ \hline
+3 & 0.8552 $\pm$ 0.0337 & 0.7849 $\pm$ 0.0457 \\ \hline
+4 & 0.8721 $\pm$ 0.0343 & 0.8395 $\pm$ 0.0486 \\ \hline
+5 & 0.8681 $\pm$ 0.0308 & 0.8196 $\pm$ 0.0476 \\ \hline
+6 & 0.8767 $\pm$ 0.0289 & 0.8270 $\pm$ 0.0778 \\ \hline
 \end{tabular}
 \label{table:image_reconstruction}
 \end{minipage}
