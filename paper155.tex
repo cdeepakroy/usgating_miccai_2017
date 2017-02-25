@@ -79,8 +79,6 @@ Cardiovascular disease is the leading cause of death worldwide and ultrasound is
 \label{sec:method}
 \vspace{-0.3cm}
 %
-In this section, we present the theory underlying the proposed methods.
-In Section~\ref{sec:method:phase_estimation}, we describe our method for estimation of instantaneous cardiac and respiratory phases. In Section~\ref{sec:method:gating}, we present a robust method to exclude video frames with significant respiratory motion. In Section~\ref{sec:method:super_resolution}, we present a kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution.
 %
 %
 \begin{IonFigT}
@@ -95,6 +93,10 @@ In Section~\ref{sec:method:phase_estimation}, we describe our method for estimat
 \caption{Illustration of correspondence between ECG and the instantaneous cardiac phase estimated using our method: (a) ECG signal (blue) and the cardiac phase estimated using our method overlaid with peaks of the QRS complex (red circle) and the corresponding cardiac phase minima (black circle), (b) Five video frames evenly spaced in time between the first and second QRS peaks of the ECG signal (top-row) and the corresponding cardiac phase minima (bottom-row) constituting one cardiac cycle.}
 \label{fig:instaphase_vs_ecg}
 \end{IonFigT}
+%
+In this section, we present the theory underlying the proposed methods.
+In Section~\ref{sec:method:phase_estimation}, we describe our method for estimation of instantaneous cardiac and respiratory phases. In Section~\ref{sec:method:gating}, we present a robust method to exclude video frames with significant respiratory motion. In Section~\ref{sec:method:super_resolution}, we present a kernel regression model for reconstructing images at any cardiac phase to facilitate temporal super-resolution.
+%
 \vspace{-0.3cm}
 \subsection{Estimation of instantaneous cardiac and respiratory phases}
 \label{sec:method:phase_estimation}
